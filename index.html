@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flight Booking</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Search Flights</h1>
+    <div class="search-form">
+        <label>From: <input type="text" id="from"></label>
+        <label>To: <input type="text" id="to"></label>
+        <label>Date: <input type="date" id="travelDate"></label>
+        <button onclick="searchFlights()">Search</button>
+    </div>
+
+    <div id="flightResults"></div>
+
+    <h2>Book Flight</h2>
+    <div class="booking-form">
+        <label>Name: <input type="text" id="name"></label>
+        <label>Email: <input type="email" id="email"></label>
+        <label>From: <input type="text" id="bookFrom"></label>
+<label>To: <input type="text" id="bookTo"></label>
+
+        <label>Date: <input type="date" id="bookDate"></label>
+        <button onclick="bookFlight()">Book</button>
+    </div>
+
+    <script>
+        function searchFlights() {
+            const from = document.getElementById("from").value;
+            const to = document.getElementById("to").value;
+            const date = document.getElementById("travelDate").value;
+
+            fetch(`http:///127.0.0.1:5000/search-flights?from=${from}&to=${to}&date=${date}`)
+                .then(res => res.json())
+                .then(data => {
+                    const container = document.getElementById("flightResults");
+                    if (data.length === 0) {
+                        container.innerHTML = "<p>No flights found.</p>";
+                        return;
+                    }
+                    let html = `<table>
+                        <tr><th>ID</th><th>Flight No</th><th>From</th><th>To</th><th>Date</th><th>Departure</th><th>Arrival</th></tr>`;
+                    data.forEach(flight => {
+                        html += `<tr>
+                            <td>${flight.id}</td>
+                            <td>${flight.flight_number}</td>
+                            <td>${flight.source}</td>
+                            <td>${flight.destination}</td>
+                            <td>${flight.travel_date}</td>
+                            <td>${flight.departure_time}</td>
+                            <td>${flight.arrival_time}</td>
+                        </tr>`;
+                    });
+                    html += "</table>";
+                    container.innerHTML = html;
+                });
+        }
+
+        function bookFlight() {
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const from = document.getElementById("bookFrom").value;
+    const to = document.getElementById("bookTo").value;
+    const date = document.getElementById("bookDate").value;
+
+    fetch("http://127.0.0.1:5000/book", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, from, to, date })
+    })
+    .then(res => res.json())
+    .then(data => alert(data.message))
+    .catch(err => alert("Booking failed"));
+}
+
+    </script>
+</body>
+</html>
